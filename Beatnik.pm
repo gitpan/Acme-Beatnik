@@ -25,116 +25,91 @@ $debug = 0;
 %scrabble = 
 ('A',1,'B',3,'C',3,'D',2,'E',1,'F',4,'G',2,'H',4,'I',1,'J',8,'K',5,'L',1,'M',3,'N',1,'O',1,'P',3,'Q',10,'R',1,'S',1,'T',1,'U',1,'V',4,'W',4,'X',8,'Y',4,'Z',10);
 
-$VERSION = '0.01';
-
-sub new {
- my $proto = shift;
- my $class = ref($proto) || $proto;
- my $self = {};
- bless($self,$class);
- return $self;
-}
+$VERSION = '0.02';
 
 sub _push
-{ my $self = shift;
-  $ip++;
+{ $ip++;
   print "pushing $numbers[$ip]\n" if $debug;
   push(@stack,$numbers[$ip]);
 }
 
 sub _pop
-{ my $self = shift;
-  my $foo = pop @stack;
+{ my $foo = pop @stack;
   print "popping $foo\n" if $debug;
   return $foo;
 }
 
 sub _add
-{ my $self = shift;
-  my($first,$second) = (pop @stack,pop @stack);
+{ my($first,$second) = (pop @stack,pop @stack);
   my $sum = $first + $second;
   push(@stack,$sum);
   print "adding $first and $second and pushing $sum on stack \n" if $debug;
 }
 
 sub _input
-{ my $self = shift;
-  print "accepting user input and pushing onto stack\n" if $debug;
+{ print "accepting user input and pushing onto stack\n" if $debug;
   push(@stack,ord(getc));
 }
 
 sub _output
-{ my $self = shift;
-  my $foo = pop @stack;
+{ my $foo = pop @stack;
   print "outputting ",chr($foo),"\n" if $debug;
   print(chr($foo));
 }
 
 sub _subtract
-{ my $self = shift;
-  my ($first,$second) = (pop @stack,pop @stack);
+{ my ($first,$second) = (pop @stack,pop @stack);
   my $diff = $first - $second;
   print "subtraction $first and $second and pushing $diff on stack\n" if $debug;
   push(@stack,$diff)
 }
 
 sub _swap
-{ my $self = shift;
-  my $a = pop(@stack);
+{ my $a = pop(@stack);
   my $b = pop(@stack);
   print "swapping $a and $b\n"if $debug;
   push(@stack,$a,$b);
 }
 
 sub _duplicate
-{ my $self = shift;
-  print "duplicating $stack[$#stack]\n" if $debug;
+{ print "duplicating $stack[$#stack]\n" if $debug;
   push(@stack,$stack[$#stack]);
 }
 
 sub _jump_forward_if_zero
-{ my $self = shift;
-  my $n = pop(@stack);
+{ my $n = pop(@stack);
   $ip++;
   if($n == 0)
   { $ip += $numbers[$ip]; print "jump $n words forward\n" if $debug; }
 }
 
 sub _jump_forward_if_not_zero
-{ my $self = shift;
-  print "jump\n";
-  my $n = pop(@stack);
+{ my $n = pop(@stack);
   $ip++;
   if($n != 0)
   { $ip += $numbers[$ip]; print "jump $n words forward\n" if $debug; }
 }
 
 sub _jump_back_if_zero
-{ my $self = shift;
-  print "jump\n";
-  my $n = pop(@stack);
+{ my $n = pop(@stack);
   $ip++;
   if($n == 0) { $ip -= $numbers[$ip]; print "jump $n words backward\n" if $debug; }
 }
 
 sub _jump_back_if_not_zero
-{ my $self = shift;
-  print "jump\n";
-  my $n = pop(@stack);
+{ my $n = pop(@stack);
   $ip++;
   if($n != 0) { $ip -= $numbers[$ip]; print "jump $n words backward\n" if $debug; }
 }
  
 sub _halt
-{ my $self = shift;
-  $ip = $#numbers+1;
+{ $ip = $#numbers+1;
   print "halting...\n" if $debug;
   exit;
 }
 
 FILTER
-{ my $self = shift;
-  $_ =~ s/[^\w\s]//g;
+{ $_ =~ s/[^\w\s]//g;
   my @words = split(/\s+/,$_);
   for my $word (@words)
   { my $number = 0;
@@ -156,13 +131,13 @@ Acme::Beatnik - Source Filter to implement the Beatnik language
 
 =head1 SYNOPSIS
 
-  use Lingua::Beatnik;
+  use Acme::Beatnik;
   blah blah blah
 
 =head1 ABSTRACT
 
-  The Beatnik language is a based on scrabble word values. Each value points to a different instruction.
-  The language is stack based and has a rather reduced instruction set.
+The Beatnik language is a based on scrabble word values. Each value points to a different instruction.
+The language is stack based and has a rather reduced instruction set.
 
 =head1 DESCRIPTION
 
@@ -184,12 +159,27 @@ Beatnik has the following word values linked to the instructions.
   11  Swap the two topmost values from stack
   12  Duplicate the first value from stack and push it onto stack
   13  Move the Instruction Pointer X values forward if the first value on stack is zero (X being the next word value)
-  14  Move the Instruction Pointer X values forward if the first value on stack is not zero (X being the next word 
-value)
+  14  Move the Instruction Pointer X values forward if the first value on stack is not zero (X being the next word value)
   15  Move the Instruction Pointer X values backward if the first value on stack is zero (X being the next word value)
-  16  Move the Instruction Pointer X values backward if the first value on stack is not zero (X being the next word 
-value)
+  16  Move the Instruction Pointer X values backward if the first value on stack is not zero (X being the next word value)
   17  Halt the program
+
+=head1 ENGLISH TILESET
+
+Since Scrabble has different letter values for different countries, there is a problem. Acme::Beatnik uses the English based tileset.
+Future versions might include the possibility to have other tilesets as well.
+
+ A=1  B=3  C=3  D=2  E=1  F=4  G=2  H=4  I=1  J=8  K=5  L=1  M=3  N=1  O=1  P=3  Q=10  R=1  S=1  T=1  U=1  V=4  W=4  X=8  Y=4  Z=10
+
+=head1 EXAMPLE
+
+  use Acme::Beatnik
+  Foo Bar Baz
+
+Foo has word value 6, Bar has word value 5, Baz has word value 14. This does the following..
+
+  Pop the first value from stack
+  Push 14 on stack
 
 =head1 AUTHOR
 
